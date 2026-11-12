@@ -1,0 +1,60 @@
+{
+  "schemaVersion": "1.0",
+  "id": "postgresql",
+  "name": "PostgreSQL MCP Server",
+  "description": "Servidor MCP local (stdio) para consultar y operar bases de datos PostgreSQL con control granular de permisos SQL.",
+  "runtime": "go",
+  "build": {
+    "type": "go",
+    "source": ".",
+    "binary": "postgresql-mcp"
+  },
+  "run": {
+    "command": "{bin_dir}/postgresql-mcp{exe_ext}",
+    "args": []
+  },
+  "env": [
+    {
+      "name": "DATABASE_HOST",
+      "description": "Host del servidor PostgreSQL accesible desde donde corre el MCP.",
+      "required": true,
+      "default": "127.0.0.1",
+      "sensitive": false
+    },
+    {
+      "name": "DATABASE_PORT",
+      "description": "Puerto TCP del servidor PostgreSQL.",
+      "required": true,
+      "default": "5432",
+      "sensitive": false
+    },
+    {
+      "name": "DATABASE_NAME",
+      "description": "Nombre de la base de datos PostgreSQL.",
+      "required": true,
+      "default": "",
+      "sensitive": false
+    },
+    {
+      "name": "DATABASE_USERNAME",
+      "description": "Usuario de conexión para PostgreSQL.",
+      "required": true,
+      "default": "",
+      "sensitive": false
+    },
+    {
+      "name": "DATABASE_PASSWORD",
+      "description": "Contraseña del usuario de PostgreSQL (se recomienda referencia {env:VAR_NAME}).",
+      "required": true,
+      "default": "{env:POSTGRES_MCP_PASSWORD}",
+      "sensitive": true
+    },
+    {
+      "name": "DATABASE_PERMISSIONS",
+      "description": "Operaciones SQL habilitadas separadas por coma (SELECT,INSERT,UPDATE,DELETE,CREATE,ALTER).",
+      "required": false,
+      "default": "SELECT",
+      "sensitive": false
+    }
+  ]
+}

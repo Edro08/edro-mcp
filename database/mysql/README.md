@@ -1,43 +1,53 @@
 # MySQL MCP
 
-Servidor MCP local (stdio) para consultar una base MySQL. Expone `list_tables`, `describe_table` y `select` por defecto; las operaciones de escritura se habilitan por separado.
+Servidor MCP local (`stdio`) para consultar y operar una base de datos MySQL. Expone `list_tables`, `describe_table` y `select` por defecto; las operaciones de escritura se habilitan explícitamente mediante `DATABASE_PERMISSIONS`.
 
-## Build
+## Instalación y Configuración Recomendada (`edro-mcp`)
 
-Desde `database/mysql`:
+Desde la raíz del repositorio `edro-mcp`, utiliza el instalador unificado para compilar el binario en `~/.mcp/bin/mysql-mcp` (o `mysql-mcp.exe` en Windows) y sincronizar tus perfiles (`mysql-local`, `mysql-staging`, etc.) en **Antigravity**, **OpenCode**, **Codex**, **Claude Code** o **Cursor**:
 
 ```sh
-go build -o mysql-mcp.exe .
+# Modo interactivo (te preguntará qué clientes y perfiles deseas usar)
+go run ./cmd/edro-mcp install
+
+# Modo directo por banderas
+go run ./cmd/edro-mcp sync --clients opencode,antigravity,codex --profiles mysql-local
 ```
 
-## Configuración en OpenCode
+### Ejemplo de Perfil en `profiles.json`
 
-Para usar el MCP desde cualquier proyecto, agrega este servidor a la configuración global `~/.config/opencode/opencode.jsonc`. Ajusta la ruta absoluta de `cwd` a donde compilaste el ejecutable y los datos de conexión a tu MySQL:
-
-```jsonc
+```json
 {
-  "$schema": "https://opencode.ai/config.json",
-  "mcp": {
-    "servers": {
-      "mysql": {
-        "type": "local",
-        "command": ["./mysql-mcp.exe"],
-        "cwd": "C:/ruta/al/proyecto/database/mysql",
-        "environment": {
-          "DATABASE_HOST": "127.0.0.1",
-          "DATABASE_PORT": "3306",
-          "DATABASE_NAME": "mi_base_de_datos",
-          "DATABASE_USERNAME": "mi_usuario",
-          "DATABASE_PASSWORD": "{env:MYSQL_MCP_PASSWORD}",
-          "DATABASE_PERMISSIONS": "SELECT"
-        }
+  "schemaVersion": "1.0",
+  "profiles": {
+    "mysql-local": {
+      "mcp": "mysql",
+      "description": "Instancia MySQL de desarrollo local",
+      "enabled": true,
+      "env": {
+        "DATABASE_HOST": "127.0.0.1",
+        "DATABASE_PORT": "3306",
+        "DATABASE_NAME": "mi_base_de_datos",
+        "DATABASE_USERNAME": "mi_usuario",
+        "DATABASE_PASSWORD": "{env:MYSQL_LOCAL_PASSWORD}",
+        "DATABASE_PERMISSIONS": "SELECT"
       }
     }
   }
 }
 ```
 
-Define `MYSQL_MCP_PASSWORD` en el entorno **antes de iniciar OpenCode**. No guardes contraseñas reales en el JSON.
+> Exporta `MYSQL_LOCAL_PASSWORD` en tu entorno antes de sincronizar o iniciar tu cliente de IA. Nunca guardes contraseñas reales en archivos seguidos por Git.
+
+## Compilación Manual (Opcional)
+
+Si deseas compilar únicamente este módulo desde `database/mysql`:
+
+```sh
+go build -o ~/.mcp/bin/mysql-mcp .
+```
+
+## Variables de Entorno
 
 | Variable | Descripción | Obligatoria |
 | --- | --- | --- |
@@ -45,7 +55,7 @@ Define `MYSQL_MCP_PASSWORD` en el entorno **antes de iniciar OpenCode**. No guar
 | `DATABASE_PORT` | Puerto de MySQL (por ejemplo, `3306`). | Sí |
 | `DATABASE_NAME` | Base de datos a utilizar. | Sí |
 | `DATABASE_USERNAME` | Usuario de MySQL. | Sí |
-| `DATABASE_PASSWORD` | Contraseña de ese usuario. | Sí |
+| `DATABASE_PASSWORD` | Contraseña de ese usuario (se recomienda `{env:VAR_NAME}`). | Sí |
 | `DATABASE_PERMISSIONS` | Operaciones habilitadas, separadas por comas: `SELECT`, `INSERT`, `UPDATE`, `DELETE`, `CREATE`, `ALTER`. Por defecto, `SELECT`. | No |
 
 ## Herramientas

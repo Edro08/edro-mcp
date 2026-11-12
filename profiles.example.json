@@ -1,0 +1,44 @@
+{
+  "schemaVersion": "1.0",
+  "profiles": {
+    "mysql-local": {
+      "mcp": "mysql",
+      "description": "Instancia MySQL de desarrollo local (lectura y escritura en esquema de pruebas)",
+      "enabled": true,
+      "env": {
+        "DATABASE_HOST": "127.0.0.1",
+        "DATABASE_PORT": "3306",
+        "DATABASE_NAME": "app_dev",
+        "DATABASE_USERNAME": "dev_user",
+        "DATABASE_PASSWORD": "{env:MYSQL_LOCAL_PASSWORD}",
+        "DATABASE_PERMISSIONS": "SELECT,INSERT,UPDATE"
+      }
+    },
+    "mysql-staging": {
+      "mcp": "mysql",
+      "description": "Réplica MySQL de pre-producción (estrictamente solo lectura)",
+      "enabled": true,
+      "env": {
+        "DATABASE_HOST": "staging-db.internal.example.com",
+        "DATABASE_PORT": "3306",
+        "DATABASE_NAME": "app_staging",
+        "DATABASE_USERNAME": "readonly_agent",
+        "DATABASE_PASSWORD": "{env:MYSQL_STAGING_PASSWORD}",
+        "DATABASE_PERMISSIONS": "SELECT"
+      }
+    },
+    "postgres-local": {
+      "mcp": "postgresql",
+      "description": "Base de datos PostgreSQL local para analítica y desarrollo",
+      "enabled": true,
+      "env": {
+        "DATABASE_HOST": "127.0.0.1",
+        "DATABASE_PORT": "5432",
+        "DATABASE_NAME": "analytics_dev",
+        "DATABASE_USERNAME": "postgres",
+        "DATABASE_PASSWORD": "{env:POSTGRES_LOCAL_PASSWORD}",
+        "DATABASE_PERMISSIONS": "SELECT"
+      }
+    }
+  }
+}

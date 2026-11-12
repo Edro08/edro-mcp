@@ -1,0 +1,157 @@
+{
+  "$comment": "Ejemplos de mcp.manifest.json para servidores MCP en Go, Python y Node.js",
+  "examples": [
+    {
+      "schemaVersion": "1.0",
+      "id": "mysql",
+      "name": "MySQL MCP Server",
+      "description": "Servidor MCP local (stdio) para consultar y operar bases de datos MySQL con control granular de permisos SQL.",
+      "runtime": "go",
+      "build": {
+        "type": "go",
+        "source": ".",
+        "binary": "mysql-mcp"
+      },
+      "run": {
+        "command": "{bin_dir}/mysql-mcp{exe_ext}",
+        "args": []
+      },
+      "env": [
+        {
+          "name": "DATABASE_HOST",
+          "description": "Host del servidor MySQL accesible desde donde corre el MCP.",
+          "required": true,
+          "default": "127.0.0.1",
+          "sensitive": false
+        },
+        {
+          "name": "DATABASE_PORT",
+          "description": "Puerto TCP del servidor MySQL.",
+          "required": true,
+          "default": "3306",
+          "sensitive": false
+        },
+        {
+          "name": "DATABASE_NAME",
+          "description": "Nombre de la base de datos a utilizar.",
+          "required": true,
+          "default": "",
+          "sensitive": false
+        },
+        {
+          "name": "DATABASE_USERNAME",
+          "description": "Usuario de conexión para MySQL.",
+          "required": true,
+          "default": "",
+          "sensitive": false
+        },
+        {
+          "name": "DATABASE_PASSWORD",
+          "description": "Contraseña del usuario de MySQL (se recomienda referencia {env:VAR_NAME}).",
+          "required": true,
+          "default": "{env:MYSQL_MCP_PASSWORD}",
+          "sensitive": true
+        },
+        {
+          "name": "DATABASE_PERMISSIONS",
+          "description": "Operaciones SQL habilitadas separadas por coma (SELECT,INSERT,UPDATE,DELETE,CREATE,ALTER).",
+          "required": false,
+          "default": "SELECT",
+          "sensitive": false
+        }
+      ]
+    },
+    {
+      "schemaVersion": "1.0",
+      "id": "postgresql",
+      "name": "PostgreSQL MCP Server",
+      "description": "Servidor MCP local (stdio) para consultar y operar bases de datos PostgreSQL con control granular de permisos SQL.",
+      "runtime": "go",
+      "build": {
+        "type": "go",
+        "source": ".",
+        "binary": "postgresql-mcp"
+      },
+      "run": {
+        "command": "{bin_dir}/postgresql-mcp{exe_ext}",
+        "args": []
+      },
+      "env": [
+        {
+          "name": "DATABASE_HOST",
+          "description": "Host del servidor PostgreSQL accesible desde donde corre el MCP.",
+          "required": true,
+          "default": "127.0.0.1",
+          "sensitive": false
+        },
+        {
+          "name": "DATABASE_PORT",
+          "description": "Puerto TCP del servidor PostgreSQL.",
+          "required": true,
+          "default": "5432",
+          "sensitive": false
+        },
+        {
+          "name": "DATABASE_NAME",
+          "description": "Nombre de la base de datos PostgreSQL.",
+          "required": true,
+          "default": "",
+          "sensitive": false
+        },
+        {
+          "name": "DATABASE_USERNAME",
+          "description": "Usuario de conexión para PostgreSQL.",
+          "required": true,
+          "default": "",
+          "sensitive": false
+        },
+        {
+          "name": "DATABASE_PASSWORD",
+          "description": "Contraseña del usuario de PostgreSQL (se recomienda referencia {env:VAR_NAME}).",
+          "required": true,
+          "default": "{env:POSTGRES_MCP_PASSWORD}",
+          "sensitive": true
+        },
+        {
+          "name": "DATABASE_PERMISSIONS",
+          "description": "Operaciones SQL habilitadas separadas por coma (SELECT,INSERT,UPDATE,DELETE,CREATE,ALTER).",
+          "required": false,
+          "default": "SELECT",
+          "sensitive": false
+        }
+      ]
+    },
+    {
+      "schemaVersion": "1.0",
+      "id": "vector-search-py",
+      "name": "Vector Search MCP (Python)",
+      "description": "Ejemplo agnóstico de lenguaje: Servidor MCP escrito en Python gestionado vía uv o wrapper instalado en ~/.mcp/bin/.",
+      "runtime": "python",
+      "build": {
+        "type": "command",
+        "command": ["uv", "sync", "--frozen"],
+        "binary": "vector-search-py"
+      },
+      "run": {
+        "command": "{bin_dir}/vector-search-py{script_ext}",
+        "args": ["--transport", "stdio"]
+      },
+      "env": [
+        {
+          "name": "EMBEDDING_API_KEY",
+          "description": "API Key para generación de embeddings.",
+          "required": true,
+          "default": "{env:EMBEDDING_API_KEY}",
+          "sensitive": true
+        },
+        {
+          "name": "INDEX_PATH",
+          "description": "Ruta al índice local de vectores.",
+          "required": false,
+          "default": "~/.mcp/data/vectors.idx",
+          "sensitive": false
+        }
+      ]
+    }
+  ]
+}

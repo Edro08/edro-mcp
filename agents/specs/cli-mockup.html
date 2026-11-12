@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>edro-mcp — CLI UX &amp; Architecture Mockup (Gate 1)</title>
+  <style>
+    :root {
+      --bg: #0d1117;
+      --panel: #161b22;
+      --border: #30363d;
+      --text: #e6edf3;
+      --muted: #8b949e;
+      --accent: #58a6ff;
+      --green: #3fb950;
+      --yellow: #d29922;
+      --purple: #bc8cff;
+      --cyan: #39c5cf;
+      --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+      --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 24px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      line-height: 1.5;
+    }
+    header {
+      max-width: 1120px;
+      margin: 0 auto 24px auto;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 16px;
+    }
+    h1 { margin: 0 0 6px 0; font-size: 1.6rem; color: var(--text); }
+    .subtitle { color: var(--muted); font-size: 0.95rem; margin: 0; }
+    .grid {
+      max-width: 1120px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+    @media (max-width: 920px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    .card-full {
+      grid-column: 1 / -1;
+    }
+    .card-header {
+      padding: 10px 16px;
+      background: #1c2128;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .dots { display: flex; gap: 6px; }
+    .dot { width: 11px; height: 11px; border-radius: 50%; }
+    .dot.r { background: #ff5f56; }
+    .dot.y { background: #ffbd2e; }
+    .dot.g { background: #27c93f; }
+    pre.terminal {
+      margin: 0;
+      padding: 18px;
+      font-family: var(--font-mono);
+      font-size: 0.83rem;
+      line-height: 1.55;
+      overflow-x: auto;
+      color: var(--text);
+      background: #090d13;
+    }
+    .c-prompt { color: var(--accent); font-weight: bold; }
+    .c-green { color: var(--green); }
+    .c-yellow { color: var(--yellow); }
+    .c-purple { color: var(--purple); }
+    .c-cyan { color: var(--cyan); }
+    .c-muted { color: var(--muted); }
+    .arch-flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding: 18px;
+      align-items: stretch;
+      justify-content: space-between;
+    }
+    .arch-step {
+      flex: 1 1 210px;
+      background: #0d1117;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+    }
+    .arch-step h3 {
+      margin: 0 0 8px 0;
+      font-size: 0.92rem;
+      color: var(--accent);
+    }
+    .arch-step ul {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 0.84rem;
+      color: var(--muted);
+    }
+    .arch-step code {
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+    }
+    .tabs {
+      display: flex;
+      gap: 6px;
+      padding: 10px 16px 0 16px;
+      border-bottom: 1px solid var(--border);
+      background: #12171e;
+      flex-wrap: wrap;
+    }
+    .tab-btn {
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid transparent;
+      border-bottom: none;
+      padding: 7px 12px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      cursor: pointer;
+      border-radius: 6px 6px 0 0;
+    }
+    .tab-btn.active {
+      background: #090d13;
+      color: var(--accent);
+      border-color: var(--border);
+    }
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>edro-mcp — Especificación Visual de CLI y Adaptadores (Gate 1)</h1>
+    <p class="subtitle">Mockup interactivo del flujo de terminal ("Preguntar qué uso"), compilación a <code>~/.mcp/bin/</code> e inyección multi-cliente.</p>
+  </header>
+
+  <div class="grid">
+    <!-- Flujo Arquitectónico -->
+    <section class="card card-full">
+      <div class="card-header">
+        <span>1. Flujo de Extremo a Extremo (Descubrimiento &rarr; Build &rarr; Perfiles &rarr; Adaptadores)</span>
+        <span class="c-muted">Portable (~/.mcp/bin)</span>
+      </div>
+      <div class="arch-flow">
+        <div class="arch-step">
+          <h3>1. Descubrimiento</h3>
+          <ul>
+            <li>Escanea <code>**/mcp.manifest.json</code></li>
+            <li>Agnóstico al lenguaje (Go, Python, Node, Binario)</li>
+            <li>Valida esquema de variables <code>env</code></li>
+          </ul>
+        </div>
+        <div class="arch-step">
+          <h3>2. Build Global</h3>
+          <ul>
+            <li>Compila cada MCP seleccionado</li>
+            <li>Instala en <code>~/.mcp/bin/&lt;binary&gt;</code></li>
+            <li>Elimina dependencia de <code>cwd</code> del repo</li>
+          </ul>
+        </div>
+        <div class="arch-step">
+          <h3>3. Perfiles Multi-Instancia</h3>
+          <ul>
+            <li>Lee <code>profiles.json</code> o <code>~/.mcp/profiles.json</code></li>
+            <li>Ej.: <code>mysql-local</code>, <code>mysql-staging</code>, <code>postgres-local</code></li>
+            <li>Protege secretos con <code>{env:VAR_NAME}</code></li>
+          </ul>
+        </div>
+        <div class="arch-step">
+          <h3>4. Inyección Segura (Merge)</h3>
+          <ul>
+            <li>Crea backup <code>.bak</code> previo</li>
+            <li>Preserva MCPs externos y ajustes previos</li>
+            <li>Escribe JSON, JSONC o TOML según cliente</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Terminal Interactiva -->
+    <section class="card">
+      <div class="card-header">
+        <span>2. Modo Interactivo ("Preguntar qué uso"): <code>edro-mcp install</code></span>
+        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+      </div>
+      <pre class="terminal"><span class="c-prompt">$</span> edro-mcp install
+
+<span class="c-cyan">╭──────────────────────────────────────────────────────────────╮
+│  edro-mcp · Instalador Multi-Agente y Gestor de Perfiles     │
+╰──────────────────────────────────────────────────────────────╯</span>
+<span class="c-muted">• Manifiestos detectados:</span> <span class="c-green">2</span> (mysql, postgresql)
+<span class="c-muted">• Archivo de perfiles:</span>   <span class="c-purple">./profiles.json</span> (3 perfiles cargados)
+
+<span class="c-yellow">? ¿Qué clientes/agentes de IA utilizas?</span> <span class="c-muted">[Espacio: marcar, Enter: confirmar]</span>
+  <span class="c-green">[x] Antigravity</span>   (~/.gemini/config/mcp_config.json)     <span class="c-green">[detectado]</span>
+  <span class="c-green">[x] OpenCode</span>      (~/.config/opencode/opencode.jsonc)    <span class="c-green">[detectado]</span>
+  <span class="c-green">[x] Codex</span>         (~/.codex/config.toml)                 <span class="c-green">[detectado]</span>
+  <span class="c-muted">[ ] Claude Code   (~/.claude.json)                       [no existe, se creará]</span>
+  <span class="c-muted">[ ] Cursor        (~/.cursor/mcp.json)                   [no existe, se creará]</span>
+
+<span class="c-yellow">? ¿Qué perfiles de servidor MCP deseas compilar y sincronizar?</span>
+  <span class="c-green">[x] mysql-local</span>     (mcp: mysql      · 127.0.0.1:3306/app_dev)
+  <span class="c-green">[x] mysql-staging</span>   (mcp: mysql      · staging-db.internal:3306/app_staging)
+  <span class="c-green">[x] postgres-local</span>  (mcp: postgresql · 127.0.0.1:5432/analytics_dev)
+
+<span class="c-cyan">[1/2] Compilando e instalando binarios en ~/.mcp/bin/...</span>
+  <span class="c-green">✔</span> mysql       &rarr; ~/.mcp/bin/mysql-mcp
+  <span class="c-green">✔</span> postgresql  &rarr; ~/.mcp/bin/postgresql-mcp
+
+<span class="c-cyan">[2/2] Sincronizando perfiles en clientes seleccionados...</span>
+  <span class="c-green">✔</span> Antigravity &rarr; ~/.gemini/config/mcp_config.json (+backup .bak)
+  <span class="c-green">✔</span> OpenCode    &rarr; ~/.config/opencode/opencode.jsonc (+backup .bak)
+  <span class="c-green">✔</span> Codex       &rarr; ~/.codex/config.toml (+backup .bak)
+
+<span class="c-green">¡Listo! 3 perfiles sincronizados en 3 clientes.</span></pre>
+    </section>
+
+    <!-- Terminal CLI Flags / List & Doctor -->
+    <section class="card">
+      <div class="card-header">
+        <span>3. Modo No Interactivo y Diagnóstico: <code>list</code> / <code>sync --dry-run</code></span>
+        <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
+      </div>
+      <pre class="terminal"><span class="c-prompt">$</span> edro-mcp list
+
+<span class="c-cyan">SERVIDORES MCP DESCUBIERTOS (mcp.manifest.json)</span>
+ID          RUNTIME  BINARIO DESTINO              VARIABLES OBLIGATORIAS
+mysql       go       ~/.mcp/bin/mysql-mcp         DATABASE_HOST, DATABASE_PORT, DATABASE_NAME, ...
+postgresql  go       ~/.mcp/bin/postgresql-mcp    DATABASE_HOST, DATABASE_PORT, DATABASE_NAME, ...
+
+<span class="c-cyan">PERFILES CONFIGURADOS (profiles.json)</span>
+PERFIL          MCP         ESTADO   VARIABLES SENSIBLES
+mysql-local     mysql       activo   DATABASE_PASSWORD={env:MYSQL_LOCAL_PASSWORD}
+mysql-staging   mysql       activo   DATABASE_PASSWORD={env:MYSQL_STAGING_PASSWORD}
+postgres-local  postgresql  activo   DATABASE_PASSWORD={env:POSTGRES_LOCAL_PASSWORD}
+
+<span class="c-prompt">$</span> edro-mcp sync --clients opencode,codex --profiles mysql-local,mysql-staging --dry-run
+
+<span class="c-yellow">[DRY-RUN] Ningún archivo será modificado en disco.</span>
+• Binario requerido: ~/.mcp/bin/mysql-mcp (OK)
+• OpenCode (~/.config/opencode/opencode.jsonc):
+  + mcp.servers["mysql-local"]   (actualizar)
+  + mcp.servers["mysql-staging"] (insertar)
+  = mcp.servers["chrome-devtools"] (preservado intacto)
+• Codex (~/.codex/config.toml):
+  + [mcp_servers.mysql-local]    (actualizar)
+  + [mcp_servers.mysql-staging]  (insertar)</pre>
+    </section>
+
+    <!-- Vista Previa de Salidas por Adaptador -->
+    <section class="card card-full">
+      <div class="card-header">
+        <span>4. Contratos de Salida por Cliente (Merge No Destructivo)</span>
+        <span class="c-muted">Selecciona un cliente para inspeccionar el formato inyectado</span>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="showTab('antigravity', this)">Antigravity (JSON)</button>
+        <button class="tab-btn" onclick="showTab('opencode', this)">OpenCode (JSONC)</button>
+        <button class="tab-btn" onclick="showTab('codex', this)">Codex (TOML)</button>
+        <button class="tab-btn" onclick="showTab('claude', this)">Claude Code (JSON)</button>
+        <button class="tab-btn" onclick="showTab('cursor', this)">Cursor (JSON)</button>
+      </div>
+
+      <div id="tab-antigravity" class="tab-panel active">
+        <pre class="terminal"><span class="c-muted">// Archivo: ~/.gemini/config/mcp_config.json</span>
+{
+  "mcpServers": {
+    "existing-external-mcp": {
+      "command": "npx",
+      "args": ["-y", "chrome-devtools-mcp"]
+    },
+    <span class="c-green">"mysql-local"</span>: {
+      "command": "<span class="c-cyan">~/.mcp/bin/mysql-mcp</span>",
+      "args": [],
+      "env": {
+        "DATABASE_HOST": "127.0.0.1",
+        "DATABASE_PORT": "3306",
+        "DATABASE_NAME": "app_dev",
+        "DATABASE_USERNAME": "dev_user",
+        "DATABASE_PASSWORD": "<span class="c-yellow">&lt;resuelto de $MYSQL_LOCAL_PASSWORD al sincronizar o literal&gt;</span>",
+        "DATABASE_PERMISSIONS": "SELECT,INSERT,UPDATE"
+      }
+    }
+  }
+}</pre>
+      </div>
+
+      <div id="tab-opencode" class="tab-panel">
+        <pre class="terminal"><span class="c-muted">// Archivo: ~/.config/opencode/opencode.jsonc (preserva comentarios y claves existentes)</span>
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "servers": {
+      <span class="c-green">"mysql-local"</span>: {
+        "type": "local",
+        "command": ["<span class="c-cyan">~/.mcp/bin/mysql-mcp</span>"],
+        "environment": {
+          "DATABASE_HOST": "127.0.0.1",
+          "DATABASE_PORT": "3306",
+          "DATABASE_NAME": "app_dev",
+          "DATABASE_USERNAME": "dev_user",
+          "DATABASE_PASSWORD": "<span class="c-purple">{env:MYSQL_LOCAL_PASSWORD}</span>",
+          "DATABASE_PERMISSIONS": "SELECT,INSERT,UPDATE"
+        }
+      }
+    }
+  }
+}</pre>
+      </div>
+
+      <div id="tab-codex" class="tab-panel">
+        <pre class="terminal"><span class="c-muted"># Archivo: ~/.codex/config.toml (preserva modelo, providers y otros mcp_servers)</span>
+model = "o3"
+
+[mcp_servers.<span class="c-green">mysql-local</span>]
+command = "<span class="c-cyan">~/.mcp/bin/mysql-mcp</span>"
+args = []
+
+[mcp_servers.<span class="c-green">mysql-local</span>.env]
+DATABASE_HOST = "127.0.0.1"
+DATABASE_PORT = "3306"
+DATABASE_NAME = "app_dev"
+DATABASE_USERNAME = "dev_user"
+DATABASE_PASSWORD = "<span class="c-yellow">&lt;resuelto de $MYSQL_LOCAL_PASSWORD&gt;</span>"
+DATABASE_PERMISSIONS = "SELECT,INSERT,UPDATE"</pre>
+      </div>
+
+      <div id="tab-claude" class="tab-panel">
+        <pre class="terminal"><span class="c-muted">// Archivo: ~/.claude.json</span>
+{
+  "mcpServers": {
+    <span class="c-green">"mysql-local"</span>: {
+      "type": "stdio",
+      "command": "<span class="c-cyan">~/.mcp/bin/mysql-mcp</span>",
+      "args": [],
+      "env": {
+        "DATABASE_HOST": "127.0.0.1",
+        "DATABASE_PORT": "3306",
+        "DATABASE_NAME": "app_dev",
+        "DATABASE_USERNAME": "dev_user",
+        "DATABASE_PASSWORD": "<span class="c-yellow">${MYSQL_LOCAL_PASSWORD}</span>",
+        "DATABASE_PERMISSIONS": "SELECT,INSERT,UPDATE"
+      }
+    }
+  }
+}</pre>
+      </div>
+
+      <div id="tab-cursor" class="tab-panel">
+        <pre class="terminal"><span class="c-muted">// Archivo: ~/.cursor/mcp.json</span>
+{
+  "mcpServers": {
+    <span class="c-green">"mysql-local"</span>: {
+      "command": "<span class="c-cyan">~/.mcp/bin/mysql-mcp</span>",
+      "args": [],
+      "env": {
+        "DATABASE_HOST": "127.0.0.1",
+        "DATABASE_PORT": "3306",
+        "DATABASE_NAME": "app_dev",
+        "DATABASE_USERNAME": "dev_user",
+        "DATABASE_PASSWORD": "<span class="c-yellow">&lt;resuelto de $MYSQL_LOCAL_PASSWORD&gt;</span>",
+        "DATABASE_PERMISSIONS": "SELECT,INSERT,UPDATE"
+      }
+    }
+  }
+}</pre>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    function showTab(id, btn) {
+      document.querySelectorAll('.tab-panel').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById('tab-' + id).classList.add('active');
+      btn.classList.add('active');
+    }
+  </script>
+</body>
+</html>
