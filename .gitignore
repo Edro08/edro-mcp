@@ -7,6 +7,9 @@
 *.dll
 *.so
 *.dylib
+/edro-mcp
+mysql-mcp
+postgresql-mcp
 
 # Test binary, built with `go test -c`
 *.test
@@ -25,8 +28,11 @@ profile.cov
 go.work
 go.work.sum
 
-# env file
+# env and local profile files
 .env
+/profiles.json
+*.bak
+*.tmp
 
 # Editor/IDE
 .idea/
