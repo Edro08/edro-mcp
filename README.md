@@ -1,8 +1,9 @@
-# edro-mcp · Instalador Multi-Agente y Monorepo de Servidores MCP
+# edro-mcp
+**Instalador Multi-Agente y Monorepo de Servidores MCP**
 
-`edro-mcp` es un repositorio unificado de servidores **Model Context Protocol (MCP)** locales (`stdio`) acompañado de una herramienta CLI en Go (sin dependencias externas) para descubrir, compilar en `~/.mcp/bin/`, gestionar múltiples perfiles de conexión (`profiles.json`) e inyectar configuraciones de forma segura en los principales agentes y clientes de IA.
+Repositorio unificado de servidores **Model Context Protocol (MCP)** locales (`stdio`) acompañado de una herramienta CLI en Go (sin dependencias externas) para descubrir, compilar en `~/.mcp/bin/`, gestionar múltiples perfiles de conexión (`profiles.json`) e inyectar configuraciones de forma segura en los principales agentes y clientes de IA.
 
-## Características Principales
+## ✨ Características Principales
 
 1. **Descubrimiento Agnóstico (`mcp.manifest.json`)**:
    Cada servidor MCP declara su contrato de compilación, ejecución y variables de entorno en un archivo `mcp.manifest.json`.
@@ -20,7 +21,7 @@
 
 ---
 
-## Servidores MCP Incluidos
+## 🔌 Servidores MCP Incluidos
 
 | Servidor | Directorio | Runtime | Descripción |
 | --- | --- | --- | --- |
@@ -28,7 +29,7 @@
 | **PostgreSQL MCP** | [`servers/database/postgresql`](servers/database/postgresql/README.md) | Go (`postgresql-mcp`) | Consultas y operaciones SQL en PostgreSQL con control granular de permisos por variable `DATABASE_PERMISSIONS`. |
 
 
-## Inicio Rápido
+## ⚡ Inicio Rápido
 
 **Requisitos:** Tener instalados **Git** y **Go** (1.27+).
 
@@ -69,7 +70,7 @@ El asistente detectará tus clientes instalados, te preguntará cuáles quieres 
 
 ---
 
-## Comandos CLI
+## 🚀 Comandos CLI
 
 Puedes pasar cualquier subcomando directamente a `.\install.ps1 <comando>` o `./install.sh <comando>` (o usar `edro-mcp <comando>` si `~/.mcp/bin` está en tu `PATH`):
 
