@@ -21,14 +21,22 @@ if (-not (Test-Path -LiteralPath $binDir)) {
 $exeName = if ($IsWindows -or $env:OS -eq 'Windows_NT') { 'edro-mcp.exe' } else { 'edro-mcp' }
 $cliBin = Join-Path $binDir $exeName
 
+$installerDir = Join-Path $repoRoot 'installer'
+
 Write-Host "[edro-mcp] Compilando CLI en $cliBin..." -ForegroundColor Cyan
-Push-Location $repoRoot
+Push-Location $installerDir
 try {
-    & go build -o $cliBin ./cmd/edro-mcp
+    & go build -o $cliBin .
     if ($LASTEXITCODE -ne 0) {
         throw "Error al compilar edro-mcp (exit code $LASTEXITCODE)."
     }
+}
+finally {
+    Pop-Location
+}
 
+Push-Location $repoRoot
+try {
     if ($ForwardArgs -and $ForwardArgs.Count -gt 0) {
         & $cliBin @ForwardArgs
     } else {

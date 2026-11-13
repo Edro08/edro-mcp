@@ -565,11 +565,8 @@ func detectRepoRoot(startDir string) string {
 		if _, err := os.Stat(filepath.Join(curr, profile.ExampleProfilesName)); err == nil {
 			return curr
 		}
-		if _, err := os.Stat(filepath.Join(curr, "go.mod")); err == nil {
-			data, _ := os.ReadFile(filepath.Join(curr, "go.mod"))
-			if strings.Contains(string(data), "module edro-mcp") {
-				return curr
-			}
+		if info, err := os.Stat(filepath.Join(curr, "servers")); err == nil && info.IsDir() {
+			return curr
 		}
 		parent := filepath.Dir(curr)
 		if parent == curr {

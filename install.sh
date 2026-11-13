@@ -9,8 +9,8 @@ CLI_BIN="${BIN_DIR}/edro-mcp"
 
 echo "[edro-mcp] Compilando CLI en ${CLI_BIN}..."
 (
-  cd "${REPO_ROOT}"
-  go build -o "${CLI_BIN}" ./cmd/edro-mcp
+  cd "${REPO_ROOT}/installer"
+  go build -o "${CLI_BIN}" .
 )
 chmod +x "${CLI_BIN}"
 

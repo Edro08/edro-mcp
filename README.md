@@ -20,83 +20,85 @@
 
 ---
 
+## Servidores MCP Incluidos
+
+| Servidor | Directorio | Runtime | Descripción |
+| --- | --- | --- | --- |
+| **MySQL MCP** | [`servers/database/mysql`](servers/database/mysql/README.md) | Go (`mysql-mcp`) | Consultas y operaciones SQL en MySQL con control granular de permisos por variable `DATABASE_PERMISSIONS`. |
+| **PostgreSQL MCP** | [`servers/database/postgresql`](servers/database/postgresql/README.md) | Go (`postgresql-mcp`) | Consultas y operaciones SQL en PostgreSQL con control granular de permisos por variable `DATABASE_PERMISSIONS`. |
+
+
 ## Inicio Rápido
 
-### 1. Configurar Perfiles Locales
+**Requisitos:** Tener instalados **Git** y **Go** (1.27+).
 
-Copia la plantilla versionada [`profiles.example.json`](profiles.example.json) a `profiles.json` (archivo ignorado por Git):
+### 1. Clona el repositorio
+```sh
+git clone https://github.com/Edro08/edro-mcp.git
+```
+
+Entra a la carpeta del proyecto:
+```sh
+cd edro-mcp
+```
+
+### 2. Configura tus perfiles
+Copia la plantilla [`profiles.example.json`](profiles.example.json) a `profiles.json` (ignorado por Git) y ajusta tus conexiones:
 
 ```sh
 cp profiles.example.json profiles.json
 ```
 
-Edita `profiles.json` con tus instancias de conexión y define las contraseñas mediante variables de entorno del sistema usando la sintaxis `{env:NOMBRE_VARIABLE}`.
+> Usa `{env:NOMBRE_VARIABLE}` en `profiles.json` para no guardar contraseñas reales en el archivo.
 
-### 2. Ejecutar el Instalador Interactivo ("Preguntar qué uso")
+### 3. Ejecuta el instalador
+El asistente detectará tus clientes instalados, te preguntará cuáles quieres configurar y compilará los binarios en `~/.mcp/bin/`:
 
-Puedes usar el script de arranque para tu sistema operativo o ejecutar directamente con `go run`:
-
-**Windows (PowerShell):**
-```powershell
-.\install.ps1
-```
-
-**Linux / macOS (Bash):**
-```bash
-./install.sh
-```
-
-**Directamente con Go:**
-```sh
-go run ./cmd/edro-mcp install
-```
-
-El asistente interactivo detectará qué clientes de IA tienes instalados, te permitirá elegir qué clientes y perfiles sincronizar, compilará los binarios necesarios en `~/.mcp/bin/` y creará copias de seguridad `.bak` antes de actualizar cada configuración.
+- **Windows (PowerShell):**
+  ```powershell
+  .\install.ps1
+  ```
+  Si Windows bloquea la ejecución de scripts:
+  ```powershell
+  powershell -ExecutionPolicy Bypass -File .\install.ps1
+  ```
+- **Linux / macOS (Bash):**
+  ```bash
+  ./install.sh
+  ```
 
 ---
 
-## Comandos y Banderas CLI
+## Comandos CLI
 
-| Comando | Descripción |
+Puedes pasar cualquier subcomando directamente a `.\install.ps1 <comando>` o `./install.sh <comando>` (o usar `edro-mcp <comando>` si `~/.mcp/bin` está en tu `PATH`):
+
+| Comando | Qué hace |
 | --- | --- |
-| `edro-mcp install` | Descubre manifiestos, compila los MCPs seleccionados hacia `~/.mcp/bin/` y sincroniza perfiles en los clientes elegidos. |
-| `edro-mcp sync` | Sincroniza perfiles en los clientes seleccionados (compilando el binario si aún no existe en `~/.mcp/bin/` o si se pasa `--build`). |
-| `edro-mcp build` | Compila e instala en `~/.mcp/bin/` todos los MCPs descubiertos o los filtrados por `--mcps`. |
-| `edro-mcp list` | Muestra en tabla (o `--json`) los servidores MCP descubiertos, perfiles cargados y clientes detectados. |
-| `edro-mcp doctor` | Verifica que los binarios en `~/.mcp/bin/` existan, valida las variables obligatorias de `profiles.json` y comprueba la sintaxis de las configuraciones de los clientes. |
+| `install` *(por defecto)* | Asistente interactivo: compila los MCPs en `~/.mcp/bin/` y sincroniza perfiles en los clientes elegidos. |
+| `sync` | Sincroniza perfiles en los clientes sin recompilar si el binario ya existe (acepta `--build` y `--dry-run`). |
+| `build` | Solo compila e instala los binarios en `~/.mcp/bin/`. |
+| `list` | Muestra los servidores MCP descubiertos, perfiles cargados y clientes detectados. |
+| `doctor` | Verifica que los binarios existan, las variables obligatorias estén definidas y los archivos de clientes sean válidos. |
 
-### Ejemplos No Interactivos (Automatización / Scripts)
+### Ejemplos sin interacción (scripts / automatización)
 
+Ver servidores, perfiles y clientes detectados:
 ```sh
-# Listar servidores MCP descubiertos, variables requeridas y estado de clientes
-go run ./cmd/edro-mcp list
-
-# Previsualizar cambios (--dry-run) sin modificar archivos en disco (oculta secretos resueltos)
-go run ./cmd/edro-mcp sync --clients antigravity,opencode,codex --profiles mysql-local,postgres-local --dry-run
-
-# Sincronizar todos los perfiles habilitados en clientes específicos
-go run ./cmd/edro-mcp sync --clients opencode,codex --profiles all
-
-# Compilar únicamente los binarios en ~/.mcp/bin/
-go run ./cmd/edro-mcp build --all
-
-# Verificar el estado de salud de binarios, perfiles y archivos de configuración
-go run ./cmd/edro-mcp doctor
+./install.sh list
 ```
 
----
+Previsualizar cambios sin modificar archivos (`--dry-run` oculta secretos):
+```sh
+./install.sh sync --clients antigravity,opencode --profiles mysql-local --dry-run
+```
 
-## Servidores MCP Incluidos
+Sincronizar todos los perfiles en clientes específicos:
+```sh
+./install.sh sync --clients opencode,codex --profiles all
+```
 
-| Servidor | Directorio | Runtime | Descripción |
-| --- | --- | --- | --- |
-| **MySQL MCP** | [`database/mysql`](database/mysql/README.md) | Go (`mysql-mcp`) | Consultas y operaciones SQL en MySQL con control granular de permisos por variable `DATABASE_PERMISSIONS`. |
-| **PostgreSQL MCP** | [`database/postgresql`](database/postgresql/README.md) | Go (`postgresql-mcp`) | Consultas y operaciones SQL en PostgreSQL con control granular de permisos por variable `DATABASE_PERMISSIONS`. |
-
----
-
-## Cómo Agregar un Nuevo Servidor MCP
-
-1. Crea una carpeta para tu servidor (por ejemplo, `database/redis` o `tools/vector-search`).
-2. Añade un archivo `mcp.manifest.json` siguiendo el contrato en [`agents/specs/mcp-manifest.example.json`](agents/specs/mcp-manifest.example.json).
-3. Ejecuta `go run ./cmd/edro-mcp list` para verificar que `edro-mcp` lo descubre automáticamente.
+Validar el estado de binarios, perfiles y configuraciones:
+```sh
+./install.sh doctor
+```
